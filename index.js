@@ -1,13 +1,13 @@
 const gh = new GitHub();
 var btn = document.getElementById('submit');
 
-function makeScene(data){
+function makeScene(githubResponse){
 	/*
 		 Data we care about:
 		 - author
 		 - by week, additions, deletions, commits
 		 */
-	var ret = data.data.reduce( function _makeAuthors( acc, authorInfo ){
+	var ret = githubResponse.data.reduce( function _makeAuthors( acc, authorInfo ){
 		var authorName = authorInfo.author.login;
 		/* commits are tuples of form { date, additions, deletions, commits } */
 		var info = authorInfo.weeks.map( function _convertWeekInfo(wi, weekNumber) {
@@ -29,10 +29,10 @@ function makeScene(data){
 }
 
 function getFreqs(){
-	var user_name = document.getElementById('user').value;//'hawthornehaus';
-	var repo_name = document.getElementById('repo').value;//'statisaur';
-	var repo = gh.getRepo(user_name, repo_name);
-	var stats = repo.getContributorStats().then(makeScene)
+	var user = document.getElementById('user').value; // e.g. 'hawthornehaus';
+	var repo = document.getElementById('repo').value; // e.g. 'statisaur';
+	gh.getRepo(user, repo).getContributorStats().then(makeScene);
+	
 }
 
 btn.addEventListener('click', getFreqs);
@@ -85,10 +85,10 @@ function init( commitInfo ) {
 	}
 
 	Object.keys(commitInfo).forEach( function _buildLines( author, authorIndex ){
-		delete_object = makeCommitLine(author, authorIndex, commitInfo, "deletions")
-			scene.add(delete_object);
-		addition_object = makeCommitLine(author, authorIndex, commitInfo, "additions")
-			scene.add(addition_object);
+		deletionObject = makeCommitLine(author, authorIndex, commitInfo, "deletions")
+			scene.add(deletionObject);
+		additionObject = makeCommitLine(author, authorIndex, commitInfo, "additions")
+			scene.add(additionObject);
 
 		console.log("Added commit line for ", author);
 	});
@@ -96,6 +96,7 @@ function init( commitInfo ) {
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	//TODO: Move this functionality to canvas
 	if(container.firstChild){
 		container.replaceChild( renderer.domElement, container.firstChild );
 	} else {

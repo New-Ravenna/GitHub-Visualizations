@@ -1,36 +1,40 @@
 const gh = new GitHub();
 var btn = document.getElementById('submit');
-var getFreqs = function(){
+
+function makeScene(data){
+	/*
+		 Data we care about:
+		 - author
+		 - by week, additions, deletions, commits
+		 */
+	var ret = data.data.reduce( function _makeAuthors( acc, authorInfo ){
+		var authorName = authorInfo.author.login;
+		/* commits are tuples of form { date, additions, deletions, commits } */
+		var info = authorInfo.weeks.map( function _convertWeekInfo(wi, weekNumber) {
+			return {
+				date: weekNumber,
+				additions: wi.a,
+				deletions: wi.d,
+				commits: wi.c
+			}
+		});
+
+		acc[authorName] = (acc[authorName] || []).concat(info);
+		return acc;
+	}, Object.create(null));
+
+	console.log(ret);
+	init(ret);
+	animate();
+}
+
+function getFreqs(){
 	var user_name = document.getElementById('user').value;//'hawthornehaus';
 	var repo_name = document.getElementById('repo').value;//'statisaur';
 	var repo = gh.getRepo(user_name, repo_name);
-	var stats = repo.getContributorStats().then(function(data){
-		/*
-			Data we care about:
-				- author
-				- by week, additions, deletions, commits
-		*/
-		var ret = data.data.reduce( function _makeAuthors( acc, authorInfo ){
-			var authorName = authorInfo.author.login;
-			/* commits are tuples of form { date, additions, deletions, commits } */
-			var info = authorInfo.weeks.map( function _convertWeekInfo(wi, weekNumber) {
-				return {
-					date: weekNumber,
-					additions: wi.a,
-					deletions: wi.d,
-					commits: wi.c
-				}
-			});
-
-			acc[authorName] = (acc[authorName] || []).concat(info);
-			return acc;
-		}, Object.create(null));
-
-		console.log(ret);
-		init(ret);
-		animate();
-	});
+	var stats = repo.getContributorStats().then(makeScene)
 }
+
 btn.addEventListener('click', getFreqs);
 
 var container;
@@ -56,14 +60,14 @@ function init( commitInfo ) {
 		// Set a random color for user
 		var material = new THREE.LineBasicMaterial();
 		//material.color = new THREE.Color( Math.random(), Math.random(), Math.random() );
-		
+
 		var keyOptions = {
-      'deletions': {'color':new THREE.Color( 1, 0, 0 ), 'xform':-1},
-      'additions': {'color':new THREE.Color( 0, 1, 0 ), 'xform':1}
+			'deletions': {'color':new THREE.Color( 1, 0, 0 ), 'xform':-1},
+			'additions': {'color':new THREE.Color( 0, 1, 0 ), 'xform':1}
 		};
 
 		material.color = keyOptions[dataKey].color;
-		
+
 		var info = commitInfo[author];
 		var commitLine = new THREE.Geometry();
 		info.forEach( function _addCommitLineVertices(d){
@@ -81,10 +85,10 @@ function init( commitInfo ) {
 	}
 
 	Object.keys(commitInfo).forEach( function _buildLines( author, authorIndex ){
-    delete_object = makeCommitLine(author, authorIndex, commitInfo, "deletions")
-		scene.add(delete_object);
-    addition_object = makeCommitLine(author, authorIndex, commitInfo, "additions")
-		scene.add(addition_object);
+		delete_object = makeCommitLine(author, authorIndex, commitInfo, "deletions")
+			scene.add(delete_object);
+		addition_object = makeCommitLine(author, authorIndex, commitInfo, "additions")
+			scene.add(addition_object);
 
 		console.log("Added commit line for ", author);
 	});

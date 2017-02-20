@@ -59,7 +59,7 @@ function init( commitInfo ) {
 			commitLine.vertices.push( new THREE.Vector3(d.date , d.additions,0 ) );
 		});
 
-		var material = new THREE.MeshBasicMaterial({wireframe:false});
+		var material = new THREE.LineBasicMaterial();
 		material.color = new THREE.Color( Math.random(), Math.random(), Math.random() );
 
 		var object = new THREE.Line( commitLine, material);

@@ -50,11 +50,11 @@ function init( commitInfo ) {
 	light.position.set( 0, 1, 0 );
 	scene.add( light );
 
-	var axisHelper = new THREE.AxisHelper( 20 );
-	axisHelper.position.x = -10;
-	axisHelper.position.y = -10;
-	axisHelper.position.z = -10;
-	scene.add( axisHelper );
+	//var axisHelper = new THREE.AxisHelper( 20 );
+	//axisHelper.position.x = -10;
+	//axisHelper.position.y = -10;
+	//axisHelper.position.z = -10;
+	//scene.add( axisHelper );
 
 	function makeCommitLine(author, authorIndex, commitInfo, dataKey){
 		// Set a random color for user
@@ -89,6 +89,9 @@ function init( commitInfo ) {
 			scene.add(deletionObject);
 		additionObject = makeCommitLine(author, authorIndex, commitInfo, "additions")
 			scene.add(additionObject);
+		textSprite = makeTextSprite( author, { fontsize: 36 } );
+		textSprite.position.set( -15, 0, authorIndex*25 );
+		scene.add(textSprite);
 
 		console.log("Added commit line for ", author);
 	});

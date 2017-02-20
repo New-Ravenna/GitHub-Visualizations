@@ -52,19 +52,39 @@ function init( commitInfo ) {
 	axisHelper.position.z = -10;
 	scene.add( axisHelper );
 
-	Object.keys(commitInfo).forEach( function _buildLines( author, authorIndex ){
+	function makeCommitLine(author, authorIndex, commitInfo, dataKey){
+		// Set a random color for user
+		var material = new THREE.LineBasicMaterial();
+		//material.color = new THREE.Color( Math.random(), Math.random(), Math.random() );
+		
+		var keyOptions = {
+      'deletions': {'color':new THREE.Color( 1, 0, 0 ), 'xform':-1},
+      'additions': {'color':new THREE.Color( 0, 1, 0 ), 'xform':1}
+		};
+
+		material.color = keyOptions[dataKey].color;
+		
 		var info = commitInfo[author];
 		var commitLine = new THREE.Geometry();
 		info.forEach( function _addCommitLineVertices(d){
-			commitLine.vertices.push( new THREE.Vector3(d.date , d.additions,0 ) );
+			// Apply transform (negation for deletion) if appropriate
+			var yValue = d[dataKey] * keyOptions[dataKey].xform;
+			// Push point onto line
+			commitLine.vertices.push( new THREE.Vector3(d.date , yValue, 0 ) );
 		});
 
-		var material = new THREE.LineBasicMaterial();
-		material.color = new THREE.Color( Math.random(), Math.random(), Math.random() );
 
-		var object = new THREE.Line( commitLine, material);
+		var object = new THREE.Line( commitLine, material );
 		object.position.z = authorIndex*25;
-		scene.add(object);
+
+		return object;
+	}
+
+	Object.keys(commitInfo).forEach( function _buildLines( author, authorIndex ){
+    delete_object = makeCommitLine(author, authorIndex, commitInfo, "deletions")
+		scene.add(delete_object);
+    addition_object = makeCommitLine(author, authorIndex, commitInfo, "additions")
+		scene.add(addition_object);
 
 		console.log("Added commit line for ", author);
 	});

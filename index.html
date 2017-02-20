@@ -4,17 +4,22 @@
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title>GitHub commit frequencies</title>
-    </head>
-    <body>
-	    <input type="text" id="user">
-	    <input type="text" id="repo">
-	    <button id="submit">Submit</button>
-	    
-	    <div id="container"> </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/github-api/3.0.0/GitHub.bundle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
-	<script src="./index.js"></script> 
+        <script src="./orbit_controls.js"></script>
+    </head>
+    <body>
+      <form onsubmit="return false">
+        <input type="text" id="user"></input>
+  	    <input type="text" id="repo"></input>
+  	    <input type="submit" id="submit" value="Get Repo Data"></input>
+      </form>
+
+	    <div id="container">
+      </div>
+
+      <script src="./index.js"></script>
     </body>
 </html>
